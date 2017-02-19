@@ -53,10 +53,25 @@ def storeHandle(request):
     db.session.commit()
     return context
 
+def storeTweet(request):
+    context = request['context']
+    entry = dict()
+    entry['confidence'] = 0
+
+    for val in request['entities']['handle']: # obtain highest confidence entry
+        if val['confidence'] > entry['confidence']:
+            entry = val
+
+    tweet = Tweet(entry['value'])
+    db.session.add(tweet)
+    db.session.commit()
+    return context
+
 actions = {
     'send': send,
     'initializeSession': initializeSession,
     'storeHandle': storeHandle
+    'storeTweet': storeTweet
 }
 
 access_token = os.environ['WIT_ACCESS_TOKEN']
@@ -71,7 +86,7 @@ db = SQLAlchemy(app)
 class Tweet(db.Model):
     __tablename__ = "tweets"
     report_id = db.Column(db.Integer, primary_key=True)
-    tweet_url = db.Column(db.String, primary_key = True)
+    tweet_url = db.Column(db.String, primary_key=True)
     def __init__(self, tweet_url):
         self.tweet_url = tweet_url
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
