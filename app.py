@@ -34,7 +34,7 @@ def initializeSession(request):
     print('CURRENT USER: ' + str(current_user))
     # executeSQL(" INSERT INTO report(email) "
     #            " VALUES('{}');".format(currentuser))
-    report = Report(username = current_user)
+    report = Report(current_user)
     db.session.add(report)
     db.session.commit()
     return request['context']
@@ -52,7 +52,7 @@ def storeHandle(request):
     #            " SET bully = '{}'"
     #            " WHERE isactive = TRUE"
     #            " AND email = '{}';".format(entry['value'], currentuser))
-    bully = Bullies(handle = entry['value'])
+    bully = Bullies(entry['value'])
     db.session.add(bully)
     db.session.commit()
     return context
@@ -79,20 +79,17 @@ class Bullies(db.Model):
 
     def __init__(self, handle):
         self.handle = handle
-        self.report_id = Report.query.filter(username=current_user, is_active=True).first().id
+        self.report_id = Report.query.filter(Report.username == current_user,
+            Report.is_active == True).first().id
 
 class Report(db.Model):
     __tablename__ = "report"
     id = db.Column(db.Integer, primary_key=True)
     is_active = db.Column(db.Boolean)
-    username = db.Column(db.String)
-    bully = db.Column(db.String)
     email = db.Column(db.String)
 
-    def __init__(self, username=None, bully=None, email=None):
+    def __init__(self, email):
         self.is_active = True
-        self.username = username
-        self.bully = bully
         self.email = email
 
 @app.route('/', methods=['GET'])
