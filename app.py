@@ -8,8 +8,9 @@ from flask import Flask, request
 from wit import Wit
 
 urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ["DATABASE_URL"])
+url = urlparse.urlparse(os.environ['DATABASE_URL'])
 currentuser = 'rj'
+dbname = 'postgresql-regular-80237'
 
 conn = psycopg2.connect(
     database=url.path[1:],
@@ -19,6 +20,7 @@ conn = psycopg2.connect(
     port=url.port
 )
 cur = conn.cursor()
+print url
 
 def send(request, response):
     recipient_id = request['session_id']
@@ -29,8 +31,9 @@ def initializeSession(request):
     print('REQUEST: '+ str(request))
     currentuser = request['entities']['email'][0]['value']
     print('CURRENT USER: ' + str(currentuser))
-    cur.execute("INSERT INTO report(email) "
-                "VALUES('{}');".format(currentuser))
+    executeSQL(" INSERT INTO report(email) "
+               " VALUES('{}');".format(currentuser))
+    return request['context']
 
 def storeHandle(request):
     print('REQUEST: ' + str(request))
@@ -40,10 +43,10 @@ def storeHandle(request):
     for val in request['entities']['handle']:
         if val['confidence'] > entry['confidence']:
             entry = val
-    cur.execute(" UPDATE report "
-                " SET bully = '{}'"
-                " WHERE isactive = TRUE"
-                " AND email = '{}';".format(entry['value'], currentuser))
+    executeSQL(" UPDATE report "
+               " SET bully = '{}'"
+               " WHERE isactive = TRUE"
+               " AND email = '{}';".format(entry['value'], currentuser))
     return context
 
 actions = {
@@ -127,6 +130,11 @@ def send_message(recipient_id, message_text):
     if r.status_code != 200:
         log(r.status_code)
         log(r.text)
+
+def executeSQL(command):
+    cur.execute('{}=#BEGIN;'.format(dbname))
+    cur.execute(command)
+    cur.execute('{}=#COMMIT;'.format(dbname))
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
