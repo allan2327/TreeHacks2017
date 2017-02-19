@@ -33,8 +33,6 @@ def initializeSession(request):
     global current_user
     current_user = request['entities']['email'][0]['value']
     print('CURRENT USER: ' + str(current_user))
-    # executeSQL(" INSERT INTO report(email) "
-    #            " VALUES('{}');".format(currentuser))
     report = Report(current_user)
     db.session.add(report)
     db.session.commit()
@@ -45,14 +43,11 @@ def storeHandle(request):
     context = request['context']
     entry = dict()
     entry['confidence'] = 0
-    for val in request['entities']['handle']:
+
+    for val in request['entities']['handle']: # obtain highest confidence entry
         if val['confidence'] > entry['confidence']:
             entry = val
 
-    # executeSQL(" UPDATE report "
-    #            " SET bully = '{}'"
-    #            " WHERE isactive = TRUE"
-    #            " AND email = '{}';".format(entry['value'], currentuser))
     bully = Bullies(entry['value'])
     db.session.add(bully)
     db.session.commit()
@@ -80,7 +75,6 @@ class Bullies(db.Model):
 
     def __init__(self, handle):
         self.handle = handle
-        print current_user
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
 
 class Report(db.Model):
@@ -162,11 +156,6 @@ def send_message(recipient_id, message_text):
     if r.status_code != 200:
         log(r.status_code)
         log(r.text)
-
-def executeSQL(command):
-    cur.execute('{}=#BEGIN;'.format(dbname))
-    cur.execute(command)
-    cur.execute('{}=#COMMIT;'.format(dbname))
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
