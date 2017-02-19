@@ -5,22 +5,23 @@ import psycopg2
 import urlparse
 import requests
 from flask import Flask, request
+from flask.ext.sqlalchemy import SQLAlchemy
 from wit import Wit
 
-urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ['DATABASE_URL'])
-currentuser = 'rj'
-dbname = 'postgresql-regular-80237'
+# urlparse.uses_netloc.append("postgres")
+# url = urlparse.urlparse(os.environ['DATABASE_URL'])
+current_user = 'rj'
+# dbname = 'postgresql-regular-80237'
 
-conn = psycopg2.connect(
-    database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port
-)
-cur = conn.cursor()
-print url
+# conn = psycopg2.connect(
+#     database=url.path[1:],
+#     user=url.username,
+#     password=url.password,
+#     host=url.hostname,
+#     port=url.port
+# )
+# cur = conn.cursor()
+# print url
 
 def send(request, response):
     recipient_id = request['session_id']
@@ -29,10 +30,13 @@ def send(request, response):
 
 def initializeSession(request):
     print('REQUEST: '+ str(request))
-    currentuser = request['entities']['email'][0]['value']
-    print('CURRENT USER: ' + str(currentuser))
-    executeSQL(" INSERT INTO report(email) "
-               " VALUES('{}');".format(currentuser))
+    current_user = request['entities']['email'][0]['value']
+    print('CURRENT USER: ' + str(current_user))
+    # executeSQL(" INSERT INTO report(email) "
+    #            " VALUES('{}');".format(currentuser))
+    report = Report(current_user)
+    db.session.add(report)
+    db.session.commit()
     return request['context']
 
 def storeHandle(request):
@@ -43,10 +47,14 @@ def storeHandle(request):
     for val in request['entities']['handle']:
         if val['confidence'] > entry['confidence']:
             entry = val
-    executeSQL(" UPDATE report "
-               " SET bully = '{}'"
-               " WHERE isactive = TRUE"
-               " AND email = '{}';".format(entry['value'], currentuser))
+
+    # executeSQL(" UPDATE report "
+    #            " SET bully = '{}'"
+    #            " WHERE isactive = TRUE"
+    #            " AND email = '{}';".format(entry['value'], currentuser))
+    bully = Bullies(entry['value'])
+    db.session.add(bully)
+    db.session.commit()
     return context
 
 actions = {
@@ -60,6 +68,29 @@ access_token = os.environ['WIT_ACCESS_TOKEN']
 client = Wit(access_token=access_token, actions=actions)
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+db = SQLAlchemy(app)
+
+class Bullies(db.Model):
+    __tablename__ = "bullies"
+    report_id = db.Column(db.Integer, primary_key=True)
+    handle = db.Column(db.String, primary_key = True)
+
+    def __init__(self, handle):
+        self.handle = handle
+        self.report_id = Report.query.filter(Report.email == current_user,
+            Report.is_active == True).first().id
+
+class Report(db.Model):
+    __tablename__ = "report"
+    id = db.Column(db.Integer, primary_key=True)
+    is_active = db.Column(db.Boolean)
+    email = db.Column(db.String)
+
+    def __init__(self, email):
+        self.is_active = True
+        self.email = email
 
 @app.route('/', methods=['GET'])
 def verify():
