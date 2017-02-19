@@ -9,6 +9,7 @@ from wit import Wit
 
 urlparse.uses_netloc.append("postgres")
 url = urlparse.urlparse(os.environ["DATABASE_URL"])
+currentuser = 'rj'
 
 conn = psycopg2.connect(
     database=url.path[1:],
@@ -25,9 +26,9 @@ def send(request, response):
     send_message(recipient_id, text)
 
 def initializeSession(request):
-    print(request)
-    cur.execute('INSERT INTO report(email)'
-                'VALUES("{}")'.format(request['entities']['email'][0]['value']))
+    currentuser = request['entities']['email'][0]['value']
+    cur.execute("INSERT INTO report(email) "
+                "VALUES('{}');".format(currentuser))
 
 def storeHandle(request):
     print('REQUEST: ' + str(request))
@@ -37,12 +38,10 @@ def storeHandle(request):
     for val in request['entities']['handle']:
         if val['confidence'] > entry['confidence']:
             entry = val
-    '''
-    cur.execute(' UPDATE report '
-                ' SET bully = "{}"'
-                ' WHERE isactive = TRUE'
-                ' AND username = "";'.format(entry['value']))
-     '''
+    cur.execute(" UPDATE report "
+                " SET bully = '{}'"
+                " WHERE isactive = TRUE"
+                " AND email = '{}';".format(entry['value'], currentuser))
     return context
 
 actions = {
