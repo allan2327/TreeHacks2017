@@ -69,6 +69,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 class Report(db.Model):
+    __tablename__ = "report"
     id = db.Column(db.Integer, primary_key=True)
     is_active = db.Column(db.Boolean)
     username = db.Column(db.String)
