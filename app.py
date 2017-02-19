@@ -1,10 +1,23 @@
 import os
 import sys
 import json
-
+import psycopg2
+import urlparse
 import requests
 from flask import Flask, request
 from wit import Wit
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+cur = conn.cursor()
 
 def send(request, response):
     recipient_id = request['session_id']
@@ -14,9 +27,8 @@ def send(request, response):
 def storeHandle(request):
     context = request['context']
     entities = request['entities']
-    with open('log.txt', 'a+') as f:
-        f.write(str(context) + ' ' + str(entities) + '\n')
-    return context
+    cur.execute(' INSERT INTO userdata (context, handle, intent) '
+                ' VALUES("{}", "{}"'.format(context, entities['handle'], entities['intent']))
 
 actions = {
     'send': send,
