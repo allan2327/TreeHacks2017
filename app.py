@@ -73,6 +73,15 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
+class Tweet(db.Model):
+    __tablename__ = "tweets"
+    report_id = db.Column(db.Integer, primary_key=True)
+    tweet_url = db.Column(db.String, primary_key = True)
+    def __init__(self, tweet_url):
+        self.tweet_url = tweet_url
+        self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
+
+
 class Bullies(db.Model):
     __tablename__ = "bullies"
     report_id = db.Column(db.Integer, primary_key=True)
