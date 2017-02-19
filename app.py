@@ -26,7 +26,9 @@ def send(request, response):
     send_message(recipient_id, text)
 
 def initializeSession(request):
+    print('REQUEST: '+ str(request))
     currentuser = request['entities']['email'][0]['value']
+    print('CURRENT USER: ' + str(currentuser))
     cur.execute("INSERT INTO report(email) "
                 "VALUES('{}');".format(currentuser))
 
