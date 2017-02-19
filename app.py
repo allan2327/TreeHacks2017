@@ -68,7 +68,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
-class Report(db.model):
+class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_active = db.Column(db.Boolean)
     username = db.Column(db.String)
