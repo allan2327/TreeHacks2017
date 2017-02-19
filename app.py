@@ -27,7 +27,7 @@ def send(request, response):
 def storeHandle(request):
     print(request)
     context = request['context']
-    entities = request['entities']
+    #entities = request['entities']
     '''
     cur.execute(' UPDATE report '
                 ' SET bully = "{}"'
