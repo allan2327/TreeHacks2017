@@ -70,7 +70,7 @@ def storeTweet(request):
 actions = {
     'send': send,
     'initializeSession': initializeSession,
-    'storeHandle': storeHandle
+    'storeHandle': storeHandle,
     'storeTweet': storeTweet
 }
 
