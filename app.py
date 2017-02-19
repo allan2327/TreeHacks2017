@@ -75,7 +75,7 @@ class Report(db.Model):
     bully = db.Column(db.String)
     email = db.Column(db.String)
 
-    def __init__(self, username=none, bully=none, email=none):
+    def __init__(self, username=None, bully=None, email=None):
         self.is_active = True
         self.username = username
         self.bully = bully
