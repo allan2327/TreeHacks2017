@@ -14,8 +14,11 @@ def send(request, response):
     text = response['text']
     send_message(recipient_id, text)
 
-def storeHandle(context, entities):
-    print(str(context) + str(entities))
+def storeHandle(request):
+    context = request['context']
+    entities = request['entities']
+    with open('log.txt', 'a+') as f:
+        f.write(str(context) + ' ' + str(entities) + '\n')
 
 actions = {
     'send': send,
