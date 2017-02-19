@@ -89,6 +89,7 @@ class Tweet(db.Model):
     tweet_url = db.Column(db.String, primary_key=True)
     def __init__(self, tweet_url):
         self.tweet_url = tweet_url
+        print("TWEET CURRENT USER*****: " + str(current_user))
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
 
 
@@ -96,8 +97,8 @@ class Bullies(db.Model):
     __tablename__ = "bullies"
     report_id = db.Column(db.Integer, primary_key=True)
     handle = db.Column(db.String, primary_key = True)
-    print("BULLY CURRENT USER*****: " + str(current_user))
     def __init__(self, handle):
+        print("BULLY CURRENT USER*****: " + str(current_user))
         self.handle = handle
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
 
