@@ -24,6 +24,11 @@ def send(request, response):
     text = response['text']
     send_message(recipient_id, text)
 
+def initializeSession(request):
+    print(request)
+    cur.execute('INSERT INTO report(email)'
+                'VALUES("{}")'.format(request['entities']['email']['value']))
+
 def storeHandle(request):
     print('REQUEST: ' + str(request))
     context = request['context']
@@ -32,14 +37,17 @@ def storeHandle(request):
     for val in request['entities']['handle']:
         if val['confidence'] > entry['confidence']:
             entry = val
+    '''
     cur.execute(' UPDATE report '
                 ' SET bully = "{}"'
                 ' WHERE isactive = TRUE'
-                ' AND username = "robbie";'.format(entry['value']))
+                ' AND username = "";'.format(entry['value']))
+     '''
     return context
 
 actions = {
     'send': send,
+    'initializeSession': initializeSession,
     'storeHandle': storeHandle
 }
 
