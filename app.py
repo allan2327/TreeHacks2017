@@ -5,6 +5,7 @@ import psycopg2
 import urlparse
 import requests
 from flask import Flask, request
+from flask.ext.sqlalchemy import SQLAlchemy
 from wit import Wit
 
 urlparse.uses_netloc.append("postgres")
@@ -60,6 +61,9 @@ access_token = os.environ['WIT_ACCESS_TOKEN']
 client = Wit(access_token=access_token, actions=actions)
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+db = SQLAlchemy(app)
 
 @app.route('/', methods=['GET'])
 def verify():
