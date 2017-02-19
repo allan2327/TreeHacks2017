@@ -57,8 +57,8 @@ def storeTweet(request):
     context = request['context']
     entry = dict()
     entry['confidence'] = 0
-
-    for val in request['entities']['handle']: # obtain highest confidence entry
+    print request
+    for val in request['entities']['url']: # obtain highest confidence entry
         if val['confidence'] > entry['confidence']:
             entry = val
 
@@ -96,7 +96,7 @@ class Bullies(db.Model):
     __tablename__ = "bullies"
     report_id = db.Column(db.Integer, primary_key=True)
     handle = db.Column(db.String, primary_key = True)
-
+    print("BULLY CURRENT USER*****: " + str(current_user))
     def __init__(self, handle):
         self.handle = handle
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
