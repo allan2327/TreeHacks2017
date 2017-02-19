@@ -74,8 +74,8 @@ db = SQLAlchemy(app)
 
 class Bullies(db.Model):
     __tablename__ = "bullies"
-    report_id = db.Column(db.Integer)
-    handle = db.Column(db.String)
+    report_id = db.Column(db.Integer, primary_key=True)
+    handle = db.Column(db.String, primary_key = True)
 
     def __init__(self, handle):
         self.handle = handle
