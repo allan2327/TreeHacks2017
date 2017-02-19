@@ -24,9 +24,8 @@ def send(request, response):
     text = response['text']
     send_message(recipient_id, text)
 
-def storeHandle(request, response):
-    print(request)
-    print(response)
+def storeHandle(request):
+    print('REQUEST: ' + str(request))
     context = request['context']
     entry = dict()
     entry['confidence'] = 0
