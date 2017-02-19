@@ -6,9 +6,6 @@ import requests
 from flask import Flask, request
 from wit import Wit
 
-def printf(val):
-    print(val)
-
 def send(request, response):
     recipient_id = request['session_id']
     text = response['text']
@@ -19,16 +16,19 @@ def storeHandle(request):
     entities = request['entities']
     with open('log.txt', 'a+') as f:
         f.write(str(context) + ' ' + str(entities) + '\n')
+    return context
 
 actions = {
     'send': send,
     'storeHandle': storeHandle
 }
-app = Flask(__name__)
+
 access_token = 'HCAWK4T6BP4HRIRJMVWIVOA2GWB66CA5'
 
 client = Wit(access_token=access_token, actions=actions)
+client.interactive()
 
+app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def verify():
