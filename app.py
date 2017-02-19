@@ -35,7 +35,7 @@ actions = {
     'storeHandle': storeHandle
 }
 
-access_token = 'HCAWK4T6BP4HRIRJMVWIVOA2GWB66CA5'
+access_token = os.environ['WIT_ACCESS_TOKEN']
 
 client = Wit(access_token=access_token, actions=actions)
 
