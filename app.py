@@ -13,8 +13,13 @@ def send(request, response):
     recipient_id = request['session_id']
     text = response['text']
     send_message(recipient_id, text)
+
+def storeHandle(context, entities):
+    print(str(context) + str(entities))
+
 actions = {
-    'send': send
+    'send': send,
+    'storeHandle': storeHandle
 }
 app = Flask(__name__)
 access_token = 'HCAWK4T6BP4HRIRJMVWIVOA2GWB66CA5'
@@ -66,6 +71,7 @@ def webhook():
                     pass
 
     return "ok", 200
+
 
 
 def send_message(recipient_id, message_text):
