@@ -1,26 +1,45 @@
 import os
 import sys
 import json
-
+import psycopg2
+import urlparse
 import requests
 from flask import Flask, request
 from wit import Wit
 
-def printf(val):
-    print(val)
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
+cur = conn.cursor()
 
 def send(request, response):
     recipient_id = request['session_id']
     text = response['text']
     send_message(recipient_id, text)
+
+def storeHandle(request):
+    context = request['context']
+    entities = request['entities']
+    cur.execute(' INSERT INTO userdata (context, handle, intent) '
+                ' VALUES("{}", "{}", "{}");'.format(context, entities['handle'], entities['intent']))
+
 actions = {
-    'send': send
+    'send': send,
+    'storeHandle': storeHandle
 }
-app = Flask(__name__)
+
 access_token = 'HCAWK4T6BP4HRIRJMVWIVOA2GWB66CA5'
 
 client = Wit(access_token=access_token, actions=actions)
 
+app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -66,6 +85,7 @@ def webhook():
                     pass
 
     return "ok", 200
+
 
 
 def send_message(recipient_id, message_text):
