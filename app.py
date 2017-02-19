@@ -32,8 +32,11 @@ def initializeSession(request):
     print('REQUEST: '+ str(request))
     currentuser = request['entities']['email'][0]['value']
     print('CURRENT USER: ' + str(currentuser))
-    executeSQL(" INSERT INTO report(email) "
-               " VALUES('{}');".format(currentuser))
+    # executeSQL(" INSERT INTO report(email) "
+    #            " VALUES('{}');".format(currentuser))
+    report = Report(username = currentuser)
+    db.session.add(report)
+    db.session.commit()
     return request['context']
 
 def storeHandle(request):
@@ -64,6 +67,19 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
+
+class Report(db.model):
+    id = db.Column(db.Integer, primary_key=True)
+    is_active = db.Column(db.Boolean)
+    username = db.Column(db.String)
+    bully = db.Column(db.String)
+    email = db.Column(db.String)
+
+    def __init__(self, username=none, bully=none, email=none):
+        self.is_active = True
+        self.username = username
+        self.bully = bully
+        self.email = email
 
 @app.route('/', methods=['GET'])
 def verify():
