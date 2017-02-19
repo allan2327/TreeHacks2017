@@ -38,7 +38,6 @@ actions = {
 access_token = 'HCAWK4T6BP4HRIRJMVWIVOA2GWB66CA5'
 
 client = Wit(access_token=access_token, actions=actions)
-client.interactive()
 
 app = Flask(__name__)
 
