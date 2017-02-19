@@ -79,7 +79,8 @@ class Bullies(db.Model):
 
     def __init__(self, handle):
         self.handle = handle
-        print Report.query.filter(Report.is_active == True).first().id
+        print Report.query.filter(Report.is_active == True).first().email
+        print Report.query.filter(Report.is_active == True).filter(Report.id == current_user).first().email
         #self.report_id = Report.query.filter(Report.email == current_user,
         #    Report.is_active == True).first().id
 
