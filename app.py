@@ -8,21 +8,7 @@ from flask import Flask, request
 from flask.ext.sqlalchemy import SQLAlchemy
 from wit import Wit
 
-# urlparse.uses_netloc.append("postgres")
-# url = urlparse.urlparse(os.environ['DATABASE_URL'])
 current_user = 'rj'
-# dbname = 'postgresql-regular-80237'
-
-# conn = psycopg2.connect(
-#     database=url.path[1:],
-#     user=url.username,
-#     password=url.password,
-#     host=url.hostname,
-#     port=url.port
-# )
-# cur = conn.cursor()
-# print url
-
 def send(request, response):
     recipient_id = request['session_id']
     text = response['text']
@@ -32,6 +18,9 @@ def initializeSession(request):
     print('REQUEST: '+ str(request))
     global current_user
     current_user = request['entities']['email'][0]['value']
+    current = Report.query.filter(Report.id == 0).first()
+    current.email = current_user
+    db.session.commit()
     print('CURRENT USER: ' + str(current_user))
     report = Report(current_user)
     db.session.add(report)
@@ -89,6 +78,7 @@ class Tweet(db.Model):
     tweet_url = db.Column(db.String, primary_key=True)
     def __init__(self, tweet_url):
         self.tweet_url = tweet_url
+        current_user = Report.query.filter(Report.id == 0).first().email
         print("TWEET CURRENT USER*****: " + str(current_user))
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
 
@@ -98,6 +88,7 @@ class Bullies(db.Model):
     report_id = db.Column(db.Integer, primary_key=True)
     handle = db.Column(db.String, primary_key = True)
     def __init__(self, handle):
+        current_user = Report.query.filter(Report.id == 0).first().email
         print("BULLY CURRENT USER*****: " + str(current_user))
         self.handle = handle
         self.report_id = Report.query.filter(Report.email == current_user, Report.is_active == True).first().id
@@ -107,7 +98,6 @@ class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_active = db.Column(db.Boolean)
     email = db.Column(db.String)
-
     def __init__(self, email):
         self.is_active = True
         self.email = email
