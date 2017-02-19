@@ -24,16 +24,20 @@ def send(request, response):
     text = response['text']
     send_message(recipient_id, text)
 
-def storeHandle(request):
+def storeHandle(request, response):
     print(request)
+    print(response)
     context = request['context']
-    #entities = request['entities']
-    '''
+    entry = dict()
+    entry['confidence'] = 0
+    for val in request['entities']['handle']:
+        if val['confidence'] > entry['confidence']:
+            entry = val
     cur.execute(' UPDATE report '
                 ' SET bully = "{}"'
                 ' WHERE isactive = TRUE'
-                ' AND username = "{}";'.format(entities['handle'], ))
-    '''
+                ' AND username = "robbie";'.format(entry['value']))
+    return context
 
 actions = {
     'send': send,
