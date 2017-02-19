@@ -28,7 +28,7 @@ def storeHandle(request):
     context = request['context']
     entities = request['entities']
     cur.execute(' INSERT INTO userdata (context, handle, intent) '
-                ' VALUES("{}", "{}"'.format(context, entities['handle'], entities['intent']))
+                ' VALUES("{}", "{}", "{}");'.format(context, entities['handle'], entities['intent']))
 
 actions = {
     'send': send,
