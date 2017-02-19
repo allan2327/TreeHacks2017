@@ -27,7 +27,7 @@ def send(request, response):
 def initializeSession(request):
     print(request)
     cur.execute('INSERT INTO report(email)'
-                'VALUES("{}")'.format(request['entities']['email']['value']))
+                'VALUES("{}")'.format(request['entities']['email'][0]['value']))
 
 def storeHandle(request):
     print('REQUEST: ' + str(request))
