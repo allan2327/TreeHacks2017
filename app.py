@@ -25,10 +25,15 @@ def send(request, response):
     send_message(recipient_id, text)
 
 def storeHandle(request):
+    print(request)
     context = request['context']
     entities = request['entities']
-    cur.execute(' INSERT INTO userdata (context, handle, intent) '
-                ' VALUES("{}", "{}", "{}");'.format(context, entities['handle'], entities['intent']))
+    '''
+    cur.execute(' UPDATE report '
+                ' SET bully = "{}"'
+                ' WHERE isactive = TRUE'
+                ' AND username = "{}";'.format(entities['handle'], ))
+    '''
 
 actions = {
     'send': send,
